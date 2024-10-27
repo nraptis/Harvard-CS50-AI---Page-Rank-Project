@@ -155,12 +155,8 @@ def iterate_pagerank(corpus, damping_factor):
         for link in corpus[page]:
             reverse_corpus[link].add(page)
 
-    max_count = 0
     for page in reverse_corpus:
         reverse_corpus[page] = list(reverse_corpus[page])
-        max_count = max(max_count, len(reverse_corpus[page]))
-    if max_count == 0:
-        return result
 
     fudge = 100000
     for _ in range(0, fudge):
@@ -176,6 +172,9 @@ def iterate_pagerank(corpus, damping_factor):
             rank_rhs = 0.0
             for link in reverse_corpus[page]:
                 num_links = len(corpus[link])
+                if num_links <= 0:
+                    num_links = pages_all_count
+                
                 rank_rhs += result[link] / num_links
             rank_rhs *= damping_factor
 
