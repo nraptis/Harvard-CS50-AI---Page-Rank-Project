@@ -12,6 +12,10 @@ def main():
         sys.exit("Usage: python pagerank.py corpus")
     corpus = crawl(sys.argv[1])
 
+    corpus = {'1': {'2'}, '2': {'1', '3'}, '3': {'5', '2', '4'}, '4': {'1', '2'}, '5': set()}
+
+    print("corpus is: ", corpus)
+
     ranks = sample_pagerank(corpus, DAMPING, SAMPLES)
     print(f"PageRank Results from Sampling (n = {SAMPLES})")
     for page in sorted(ranks):
@@ -146,17 +150,17 @@ def iterate_pagerank(corpus, damping_factor):
     for page in pages_all:
         result[page] = 1.0 / pages_all_count
 
-    reverse_corpus = {}
+    #reverse_corpus = {}
 
-    for page in pages_all:
-        reverse_corpus[page] = set()
+    #for page in pages_all:
+    #    reverse_corpus[page] = set()
 
-    for page in pages_all:
-        for link in corpus[page]:
-            reverse_corpus[link].add(page)
+    #for page in pages_all:
+    #    for link in corpus[page]:
+    #        reverse_corpus[link].add(page)
 
-    for page in reverse_corpus:
-        reverse_corpus[page] = list(reverse_corpus[page])
+    #for page in reverse_corpus:
+    #    reverse_corpus[page] = list(reverse_corpus[page])
 
     fudge = 100000
     for _ in range(0, fudge):
@@ -165,16 +169,23 @@ def iterate_pagerank(corpus, damping_factor):
 
         for page in pages_all:
 
+            linkz = []
+            for corpus_page, courpus_links in corpus.items():
+                #print("corpus_page = ", corpus_page, " courpus_links = ", courpus_links)
+                if not courpus_links:
+                    linkz.append(corpus_page)
+                elif page in courpus_links:
+                    linkz.append(corpus_page)
+            
             # The left-hand-side of the equation...
             rank_lhs = damping_factor_inverse / pages_all_count
 
             # The right-hand-side of the equation...
             rank_rhs = 0.0
-            for link in reverse_corpus[page]:
+            for link in linkz:
                 num_links = len(corpus[link])
                 if num_links <= 0:
                     num_links = pages_all_count
-                
                 rank_rhs += result[link] / num_links
             rank_rhs *= damping_factor
 
