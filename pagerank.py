@@ -131,6 +131,7 @@ def sample_pagerank(corpus, damping_factor, n):
     return result
 
 def iterate_pagerank(corpus, damping_factor):
+    
     """
     Return PageRank values for each page by iteratively updating
     PageRank values until convergence.
@@ -150,39 +151,30 @@ def iterate_pagerank(corpus, damping_factor):
     for page in pages_all:
         result[page] = 1.0 / pages_all_count
 
-    #reverse_corpus = {}
+    lookup_corpus = {}
 
-    #for page in pages_all:
-    #    reverse_corpus[page] = set()
-
-    #for page in pages_all:
-    #    for link in corpus[page]:
-    #        reverse_corpus[link].add(page)
-
-    #for page in reverse_corpus:
-    #    reverse_corpus[page] = list(reverse_corpus[page])
+    for page in pages_all:
+        links = []
+        for corpus_page, courpus_links in corpus.items():
+            if not courpus_links:
+                links.append(corpus_page)
+            elif page in courpus_links:
+                links.append(corpus_page)
+        lookup_corpus[page] = links
 
     fudge = 100000
     for _ in range(0, fudge):
         out_of_range = False
-        hold = dict(result)
-
+        hold = result.copy()
+        
         for page in pages_all:
 
-            linkz = []
-            for corpus_page, courpus_links in corpus.items():
-                #print("corpus_page = ", corpus_page, " courpus_links = ", courpus_links)
-                if not courpus_links:
-                    linkz.append(corpus_page)
-                elif page in courpus_links:
-                    linkz.append(corpus_page)
-            
             # The left-hand-side of the equation...
             rank_lhs = damping_factor_inverse / pages_all_count
 
             # The right-hand-side of the equation...
             rank_rhs = 0.0
-            for link in linkz:
+            for link in lookup_corpus[page]:
                 num_links = len(corpus[link])
                 if num_links <= 0:
                     num_links = pages_all_count
@@ -201,7 +193,6 @@ def iterate_pagerank(corpus, damping_factor):
             break
 
     return result
-
 
 if __name__ == "__main__":
     main()
